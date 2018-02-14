@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="top"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/turnNumberID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp"
+        android:text="Turn: 12"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/playerNameID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/turnNumberID"
+        android:layout_marginLeft="5dp"
+        android:lines="1"
+        android:text="Player: David, Color: Green"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/rollNumberID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/playerNameID"
+        android:layout_alignBottom="@+id/playerNameID"
+        android:layout_marginStart="20dp"
+        android:layout_toEndOf="@+id/playerNameID"
+        android:lines="1"
+        android:text="Roll Value: 7"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/totalRolledAmountID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/rollNumberID"
+        android:layout_alignBottom="@+id/rollNumberID"
+        android:layout_marginStart="20dp"
+        android:layout_toEndOf="@+id/rollNumberID"
+        android:text="| Rolled: 14 (8%)" />
+
+
+</RelativeLayout>
