@@ -1,12 +1,15 @@
 package com.dave.CatanStats;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Adapter;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
-import com.dave.CatanStats.R;
+
 
 /**
  Created: DFredlund 02/13/2018
@@ -27,6 +30,9 @@ public class RollActivity extends AppCompatActivity {
     private ListView catanGameTurnList;
     CatanStatsDatabase catanStatsDatabase;
     CatanGame catanGame;
+    public static final String TURN = "Turn";
+    public static final String PLAYER_LIST = "Player_List";
+    private static final int CATAN_TURN_MODIFIED_REQUEST_CODE = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -126,17 +132,46 @@ public class RollActivity extends AppCompatActivity {
                 NumberButtonClicked(v,12);
             }
         });
+
+
         //endregion
 
         CatanTurnAdapter catanTurnAdapter = catanGame.GetTurnAdapter();
 
         catanGameTurnList.setAdapter(catanTurnAdapter);
+        catanGameTurnList.setOnItemClickListener(
+                new OnItemClickListener(){
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View v, int position, long rowId){
+                        Intent intent = new Intent(RollActivity.this, CatanTurnEditorActivity.class);
+                        intent.putExtra(TURN, catanTurnAdapter.getItem(position));
+                        intent.putExtra(PLAYER_LIST, catanGame.GetPlayerList());
+                        startActivityForResult(intent,CATAN_TURN_MODIFIED_REQUEST_CODE);
+                    }
+                }
+        );
     }
 
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent)
+	{
+		super.onActivityResult(requestCode, resultCode, intent);
+
+		if (requestCode == CATAN_TURN_MODIFIED_REQUEST_CODE)
+		{
+			if (resultCode == RESULT_OK)
+			{
+				CatanTurn updatedTurn = (CatanTurn) intent.getSerializableExtra(TURN);
+				catanGame.UpdateTurn(updatedTurn);
+			}
+		}
+	}
     public void NumberButtonClicked(View vw, int buttonNumber)
     {
         catanGame.RollDice(vw, buttonNumber);
     }
+
 }
 
 

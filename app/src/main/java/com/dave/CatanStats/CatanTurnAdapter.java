@@ -7,8 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.dave.CatanStats.CatanGame.*;
-import com.dave.CatanStats.R;
+import com.dave.CatanStats.CatanTurn;
 
 import java.util.ArrayList;
 

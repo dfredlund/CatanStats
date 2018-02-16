@@ -8,7 +8,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 /**
- * Created by Dave on 1/21/2018.
+ Created: DFredlund 02/13/2018
  */
 
 public class CatanStatsDatabase extends SQLiteOpenHelper {
