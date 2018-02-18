@@ -12,7 +12,7 @@ import com.dave.CatanStats.CatanTurn;
 import java.util.ArrayList;
 
 /**
- * Created by Dave on 2/11/2018.
+Created: DFredlund 02/13/2018
  */
 
 public class CatanTurnAdapter extends ArrayAdapter<CatanTurn> {

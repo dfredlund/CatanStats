@@ -12,7 +12,7 @@ import com.dave.CatanStats.CatanGame.*;
 import java.util.ArrayList;
 
 /**
- * Created by Dave on 2/11/2018.
+Created: DFredlund 2/11/2018.
  */
 
 public class CatanPlayerAdapter extends ArrayAdapter<Player> {

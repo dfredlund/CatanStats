@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 import com.dave.CatanStats.CatanGame.*;
 /**
-Created: DFredlund 02/14/2018
+ Created: DFredlund 02/13/2018
  */
     /*
     CatanTurn Encapsulates information about a single turn in each CatanGame.
@@ -31,11 +31,11 @@ public class CatanTurn implements Serializable
 	private HashMap<Integer,Float> expectedValues;
 	private transient final ForegroundColorSpan red = new ForegroundColorSpan(Color.rgb(255,0,0));
 	private transient final ForegroundColorSpan green = new ForegroundColorSpan(Color.rgb(0,255,0));
-	private final String COLOR = "color";
-	private final String PLAYER_NAME= "playerName";
-	private final String TURN_NUMBER = "turnNumber";
-	private final String ROLL_VALUE = "rollValue";
-	private final String AMOUNT_ROLLED_SO_FAR = "amountRolledSoFar";
+	public final static String COLOR = "color";
+	public final static String PLAYER_NAME= "playerName";
+	public final static String TURN_NUMBER = "turnNumber";
+	public final static String ROLL_VALUE = "rollValue";
+	public final static String AMOUNT_ROLLED_SO_FAR = "amountRolledSoFar";
 	private static final long serialVersionUID = -8959832007991513854L;
 
 	//endregion
@@ -51,10 +51,11 @@ public class CatanTurn implements Serializable
 	}
 	public CatanTurn(){};
 
-	public CatanTurn (JSONObject jsonObject)
+	public CatanTurn (String jsonObjectAsString)
 	{
 		try
 		{
+			JSONObject jsonObject = new JSONObject(jsonObjectAsString);
 			String color = jsonObject.getString(COLOR);
 			String playerName = jsonObject.getString(PLAYER_NAME);
 			this.player = new Player(PlayerColor.valueOf(color), playerName);
