@@ -35,6 +35,7 @@ public class CatanTurn implements Serializable
 	public final static String PLAYER_NAME= "playerName";
 	public final static String TURN_NUMBER = "turnNumber";
 	public final static String ROLL_VALUE = "rollValue";
+	public final static String PLAYER = "player";
 	public final static String AMOUNT_ROLLED_SO_FAR = "amountRolledSoFar";
 	private static final long serialVersionUID = -8959832007991513854L;
 
@@ -122,8 +123,8 @@ public class CatanTurn implements Serializable
 		JSONObject catanTurn = new JSONObject();
 		try
 		{
-			catanTurn.put(COLOR, this.player.color);
-			catanTurn.put(PLAYER_NAME, this.player.name);
+			catanTurn.put(COLOR, this.player.getColor());
+			catanTurn.put(PLAYER_NAME, this.player.getName());
 			catanTurn.put(TURN_NUMBER, this.turnNumber);
 			catanTurn.put(ROLL_VALUE, this.rollValue);
 			catanTurn.put(AMOUNT_ROLLED_SO_FAR, this.amountRolledSoFar);

@@ -10,9 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name="com.dave.CatanStats.CatanGameActivity">
-
         </activity>
-
         <activity android:name="com.dave.CatanStats.StartScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,6 +21,8 @@
         <activity android:name="com.dave.CatanStats.CatanTurnEditorActivity">
         </activity>
         <activity android:name="com.dave.CatanStats.CatanHistoricalGamesActivity">
+        </activity>
+        <activity android:name="com.dave.CatanStats.CatanPreGameOptionsActivity">
         </activity>
     </application>
 

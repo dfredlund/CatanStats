@@ -56,7 +56,8 @@ public class CatanStatsDatabase extends SQLiteOpenHelper {
 		db.execSQL(SQL_CREATE_HISTORICALGAMES);
 		Log.d("DEBUG", SQL_CREATE_HISTORICALGAMETURNS);
 		db.execSQL(SQL_CREATE_HISTORICALGAMETURNS);
-
+		Log.d("DEBUG",SQL_CREATE_HISTORICALGAMEPLAYERS);
+		db.execSQL(SQL_CREATE_HISTORICALGAMEPLAYERS);
 	}
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
@@ -72,6 +73,14 @@ public class CatanStatsDatabase extends SQLiteOpenHelper {
 		SQLiteDatabase db = getReadableDatabase();
 		Cursor gameCursor = db.query(HistoricalGameTurns.TABLE_NAME,new String[]{HistoricalGameTurns.COLUMN_TurnJSON},
 				"HistoricalGames_GameNumber_FK= ?",new String[]{String.valueOf(gameID)},null, null, HistoricalGameTurns.COLUMN_HistoricalGames_TurnNumber +" ASC");
+
+		return gameCursor;
+	}
+	public Cursor GetOrderedPlayerCursorByGameID(int gameID)
+	{
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor gameCursor = db.query(HistoricalGamePlayers.TABLE_NAME,new String[]{HistoricalGamePlayers.COLUMN_PlayerColor, HistoricalGamePlayers.COLUMN_PlayerName},
+				"HistoricalGames_GameNumber_FK= ?",new String[]{String.valueOf(gameID)},null, null, HistoricalGamePlayers.COLUMN_TurnOrder +" ASC");
 
 		return gameCursor;
 	}
@@ -102,6 +111,52 @@ public class CatanStatsDatabase extends SQLiteOpenHelper {
 
 		if(cursor != null)
 			cursor.close();
+	}
+	public void BatchUpdateGamePlayer(ArrayList<CatanGame.Player> playerArrayList, int gameID)
+	{
+		SQLiteDatabase readableDatabase = getReadableDatabase();
+		Cursor cursor = readableDatabase.query(HistoricalGamePlayers.TABLE_NAME, new String[]{HistoricalGamePlayers._ID},
+				String.format("%s= ?", HistoricalGamePlayers.COLUMN_HistoricalGames_GameNumber_FK),
+				new String[]{String.valueOf(gameID)},
+				null,null,null);
+
+		int idOfExisting;
+		SQLiteDatabase writableDatabase = getWritableDatabase();
+		//If the returned cursor has a different number of players than the input list, clear out the table with this game number entirely
+		if(cursor != null && cursor.getCount() != playerArrayList.size())
+		{
+				writableDatabase.delete(HistoricalGamePlayers.TABLE_NAME, String.format("%s= ?", HistoricalGamePlayers.COLUMN_HistoricalGames_GameNumber_FK),
+						new String[]{String.valueOf(gameID)});
+		}
+		for(int i = 0; i<playerArrayList.size(); i++)
+		{
+			CatanGame.Player player = playerArrayList.get(i);
+			idOfExisting = -1;
+			cursor = readableDatabase.query(HistoricalGamePlayers.TABLE_NAME, new String[]{HistoricalGamePlayers._ID},
+					String.format("%s= ? and %s= ?", HistoricalGamePlayers.COLUMN_HistoricalGames_GameNumber_FK, HistoricalGamePlayers.COLUMN_TurnOrder),
+					new String[]{String.valueOf(gameID), String.valueOf(i)},
+					null,null,HistoricalGamePlayers.COLUMN_TurnOrder +" ASC");
+			if (cursor != null && cursor.getCount() > 0 && cursor.moveToNext())
+			{
+				idOfExisting = cursor.getInt(0);
+				cursor.close();
+			}
+
+			ContentValues contentValues = new ContentValues();
+			contentValues.put(HistoricalGamePlayers.COLUMN_ModifiedTimestamp, dateTimeFormat.format(Calendar.getInstance().getTime()).toString());
+			contentValues.put(HistoricalGamePlayers.COLUMN_PlayerColor, player.getColor().toString());
+			contentValues.put(HistoricalGamePlayers.COLUMN_PlayerName, player.getName());
+			contentValues.put(HistoricalGamePlayers.COLUMN_TurnOrder, i);
+
+			if (idOfExisting == -1)
+			{
+				contentValues.put(HistoricalGamePlayers.COLUMN_HistoricalGames_GameNumber_FK, gameID);
+				contentValues.put(HistoricalGamePlayers.COLUMN_CreatedTimestamp, dateTimeFormat.format(Calendar.getInstance().getTime()).toString());
+				writableDatabase.insertWithOnConflict(HistoricalGamePlayers.TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
+			} else
+				writableDatabase.updateWithOnConflict(HistoricalGamePlayers.TABLE_NAME, contentValues, "_id = ?", new String[]{String.valueOf(idOfExisting)}, SQLiteDatabase.CONFLICT_IGNORE);
+		}
+
 	}
 
 	public void UpsertTurn(JSONObject jsonObject, int gameID)
@@ -171,7 +226,19 @@ public class CatanStatsDatabase extends SQLiteOpenHelper {
 				jsonObject.put(CatanHistoricalGamesActivity.GAME_NUMBER, cursor.getInt(0));
 				jsonObject.put(CatanHistoricalGamesActivity.GAME_PLAYED_ON, dateFormat.format(dateTimeFormat.parse(cursor.getString(1))));
 				jsonObject.put(CatanHistoricalGamesActivity.NUMBER_TURNS, cursor.getInt(2));
-				jsonObject.put(CatanHistoricalGamesActivity.PLAYER_NAMES, "Dave, Me, Friend");
+				Cursor playerCursor = readableDatabase.query(HistoricalGamePlayers.TABLE_NAME, new String[]{HistoricalGamePlayers.COLUMN_PlayerName},
+						"HistoricalGames_GameNumber_FK= ?",new String[]{String.valueOf(cursor.getInt(0))},
+						null,null,HistoricalGamePlayers.COLUMN_TurnOrder + " ASC");
+				String playersConcatenated = "";
+				while (playerCursor.moveToNext())
+				{
+					playersConcatenated+= playerCursor.getString(0) + "; ";
+				}
+				if(!playersConcatenated.isEmpty())
+					playersConcatenated = playersConcatenated.substring(0, playersConcatenated.length()-2);
+				if(playerCursor != null)
+					playerCursor.close();
+				jsonObject.put(CatanHistoricalGamesActivity.PLAYER_NAMES, playersConcatenated);
 				historicalGames.add(jsonObject);
 			}
 		}catch (JSONException | ParseException e)
@@ -224,6 +291,28 @@ public class CatanStatsDatabase extends SQLiteOpenHelper {
 		public static final String COLUMN_CreatedTimestamp = "CreatedOn";
 		public static final String COLUMN_ModifiedTimestamp = "ModifiedOn";
 		public static final String COLUMN_TurnJSON = "TurnJSON";
+	}
+
+	public static final String SQL_CREATE_HISTORICALGAMEPLAYERS =
+			"CREATE TABLE "+ HistoricalGamePlayers.TABLE_NAME
+					+" (" +
+					HistoricalGamePlayers._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+					HistoricalGamePlayers.COLUMN_HistoricalGames_GameNumber_FK + " INTEGER NOT NULL, " +
+					HistoricalGamePlayers.COLUMN_CreatedTimestamp + " TEXT NOT NULL, " +
+					HistoricalGamePlayers.COLUMN_ModifiedTimestamp + " TEXT NOT NULL, " +
+					HistoricalGamePlayers.COLUMN_PlayerName + " TEXT, " +
+					HistoricalGamePlayers.COLUMN_PlayerColor + " TEXT, " +
+					HistoricalGamePlayers.COLUMN_TurnOrder + " INTEGER NOT NULL" +
+					" )";
+
+	public static class HistoricalGamePlayers implements BaseColumns {
+		public static final String TABLE_NAME = "HistoricalGamePlayers";
+		public static final String COLUMN_HistoricalGames_GameNumber_FK = "HistoricalGames_GameNumber_FK";
+		public static final String COLUMN_CreatedTimestamp = "CreatedOn";
+		public static final String COLUMN_ModifiedTimestamp = "ModifiedOn";
+		public static final String COLUMN_PlayerName = "PlayerName";
+		public static final String COLUMN_PlayerColor = "PlayerColor";
+		public static final String COLUMN_TurnOrder = "TurnOrder";
 	}
 	//endregion
 }

@@ -24,6 +24,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/turnNumberID"
         android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
         android:lines="1"
         android:text="Player: David, Color: Green"
         android:textSize="14sp" />
@@ -32,10 +33,9 @@
         android:id="@+id/rollNumberID"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/playerNameID"
-        android:layout_alignBottom="@+id/playerNameID"
-        android:layout_marginStart="20dp"
-        android:layout_toEndOf="@+id/playerNameID"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="55dp"
+        android:layout_toEndOf="@+id/turnNumberID"
         android:lines="1"
         android:text="Roll Value: 7"
         android:textSize="14sp" />
@@ -44,10 +44,10 @@
         android:id="@+id/totalRolledAmountID"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/rollNumberID"
-        android:layout_alignBottom="@+id/rollNumberID"
-        android:layout_marginStart="20dp"
-        android:layout_toEndOf="@+id/rollNumberID"
+        android:layout_below="@+id/rollNumberID"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="15dp"
+        android:layout_toEndOf="@+id/playerNameID"
         android:text="| Rolled: 14 (8%)" />
 
 

@@ -10,6 +10,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+
 
 /**
  Created: DFredlund 02/13/2018
@@ -26,7 +28,7 @@ public class CatanGameActivity extends AppCompatActivity {
 	private CatanStatsDatabase catanStatsDatabase;
 	CatanGame catanGame;
 	public static final String TURN = "Turn";
-	public static final String PLAYER_LIST = "Player_List";
+	public static final String PLAYER_LIST = "PlayerList";
 	private static final int CATAN_TURN_MODIFIED_REQUEST_CODE = 1;
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -37,7 +39,8 @@ public class CatanGameActivity extends AppCompatActivity {
 		catanStatsDatabase = CatanStatsDatabase.getInstance(getApplicationContext());
 		catanGameTurnList = findViewById(R.id.turnList);
 		int gameID = getIntent().getIntExtra(StartScreenActivity.GAME_NUMBER, 1);
-		catanGame = CatanGame.GetExistingOrCreateCatanGame(this,gameID);
+		ArrayList<CatanGame.Player> playerArrayList = (ArrayList<CatanGame.Player>) getIntent().getSerializableExtra(CatanGameActivity.PLAYER_LIST);
+		catanGame = CatanGame.GetExistingOrCreateCatanGame(this,gameID, playerArrayList);
 		catanStatsDatabase.UpsertGame(gameID);
 
 		//region declare Buttons
